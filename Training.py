@@ -3,8 +3,8 @@ import numpy as np
 import os
 import pandas as pd
 import tensorflow as tf
-import WindowGenerator
-
+from Temperature_Humidity_Forecasting.WindowGenerator import WindowGenerator 
+from Temperature_Humidity_Forecasting.multi_outputMAE import multi_outputMAE 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--version', type=str, required=True)
@@ -66,7 +66,8 @@ model = tf.keras.Sequential([
                           tf.keras.layers.Conv1D(filters=64, kernel_size=3, activation = "relu"),
                           tf.keras.layers.Flatten(),
                           tf.keras.layers.Dense(units=64, activation = 'relu'),
-                          tf.keras.layers.Dense(units=2*output_width)])
+                          tf.keras.layers.Dense(units=2*output_width),
+                          tf.keras.layers.Reshape((output_width, 2))])])
 
 model.compile(optimizer='adam',
             loss = tf.keras.losses.mean_squared_error,
