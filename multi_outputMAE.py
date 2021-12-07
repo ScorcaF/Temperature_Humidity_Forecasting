@@ -1,7 +1,4 @@
-import argparse
-import numpy as np
-import os
-import pandas as pd
+
 import tensorflow as tf
 
 class multi_outputMAE(tf.keras.metrics.Metric):
@@ -20,7 +17,7 @@ class multi_outputMAE(tf.keras.metrics.Metric):
         self.counter.assign_add(1)
 
         
-    def reset_states(self, sample_weight = None):
+    def reset_state(self, sample_weight = None):
         self.mae.assign(tf.zeros_like(self.mae))
         self.counter.assign(tf.zeros_like(self.counter))
 
