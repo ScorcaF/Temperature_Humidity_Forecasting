@@ -2,7 +2,7 @@ import tensorflow as tf
 
 
 class WindowGenerator:
-    def __init__(self, input_width, output_width, output_mean, std):
+    def __init__(self, input_width, output_width, mean, std):
         self.input_width = input_width
         self.output_width = output_width
         self.mean = tf.reshape(tf.convert_to_tensor(mean), [1, 1, 2])
