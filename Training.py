@@ -3,8 +3,8 @@ import numpy as np
 import os
 import pandas as pd
 import tensorflow as tf
-from Temperature_Humidity_Forecasting.WindowGenerator import WindowGenerator 
-from Temperature_Humidity_Forecasting.multi_outputMAE import multi_outputMAE 
+from WindowGenerator import WindowGenerator 
+from multi_outputMAE import multi_outputMAE 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--version', type=str, required=True)
