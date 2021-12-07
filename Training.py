@@ -67,7 +67,7 @@ model = tf.keras.Sequential([
                           tf.keras.layers.Flatten(),
                           tf.keras.layers.Dense(units=64, activation = 'relu'),
                           tf.keras.layers.Dense(units=2*output_width),
-                          tf.keras.layers.Reshape((output_width, 2))])])
+                          tf.keras.layers.Reshape((output_width, 2))])
 
 model.compile(optimizer='adam',
             loss = tf.keras.losses.mean_squared_error,
