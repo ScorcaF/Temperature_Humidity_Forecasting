@@ -6,8 +6,7 @@ import tensorflow as tf
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', type=str, required=True, help='model name')
-parser.add_argument('--labels', type=int, required=True, help='model output')
+parser.add_argument('--version', type=str, required=True)
 args = parser.parse_args()
 
 
@@ -36,29 +35,27 @@ mean = train_data.mean(axis=0)
 std = train_data.std(axis=0)
 
 input_width = 6
-LABEL_OPTIONS = args.labels
+
+if args.version == "a":
+    output_width = 3
+elif args.version == "b":
+    output_width = 9
+   
 
 
 class WindowGenerator:
-    def __init__(self, input_width, label_options, mean, std):
+    def __init__(self, input_width, output_width, output_mean, std):
         self.input_width = input_width
-        self.label_options = label_options
+        self.output_width = output_width
         self.mean = tf.reshape(tf.convert_to_tensor(mean), [1, 1, 2])
         self.std = tf.reshape(tf.convert_to_tensor(std), [1, 1, 2])
 
     def split_window(self, features):
-        inputs = features[:, :-1, :]
-
-        if self.label_options < 2:
-            labels = features[:, -1, self.label_options]
-            labels = tf.expand_dims(labels, -1)
-            num_labels = 1
-        else:
-            labels = features[:, -1, :]
-            num_labels = 2
-
+        inputs = features[:, :-self.output_width, :] 
+        labels = features[:, -self.output_width:, :]
+        
         inputs.set_shape([None, self.input_width, 2])
-        labels.set_shape([None, num_labels])
+        labels.set_shape([None, self.output_width, 2])
 
         return inputs, labels
 
@@ -77,7 +74,7 @@ class WindowGenerator:
         ds = tf.keras.preprocessing.timeseries_dataset_from_array(
                 data=data,
                 targets=None,
-                sequence_length=input_width+1,
+                sequence_length=self.input_width+self.output_width,
                 sequence_stride=1,
                 batch_size=32)
         ds = ds.map(self.preprocess)
@@ -88,7 +85,7 @@ class WindowGenerator:
         return ds
 
 
-generator = WindowGenerator(input_width, LABEL_OPTIONS, mean, std)
+generator = WindowGenerator(input_width, output_width, mean, std)
 train_ds = generator.make_dataset(train_data, True)
 val_ds = generator.make_dataset(val_data, False)
 test_ds = generator.make_dataset(test_data, False)
