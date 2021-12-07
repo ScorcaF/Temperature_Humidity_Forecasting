@@ -1,3 +1,5 @@
+import tensorflow as tf
+
 
 class WindowGenerator:
     def __init__(self, input_width, output_width, output_mean, std):
