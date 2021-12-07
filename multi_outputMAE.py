@@ -8,7 +8,6 @@ class multi_outputMAE(tf.keras.metrics.Metric):
         self.counter = self.add_weight(name='counter', initializer='zeros')
 
     def update_state(self, y_true, y_pred, sample_weight = None):
-        values = tf.reshape(y_pred, [32, -1, 2])
         values = tf.subtract(y_true, y_pred)
         values = tf.abs(values)
         values = tf.math.reduce_mean(values, axis = 1)
