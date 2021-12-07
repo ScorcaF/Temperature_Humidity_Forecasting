@@ -74,3 +74,9 @@ model.compile(optimizer='adam',
             metrics= [multi_outputMAE()])
 
 history = model.fit(train_ds, validation_data = val_ds, epochs=20, callbacks=[cp_callback])
+
+temp, hum = model.evaluate(test_ds)[1]
+size = os.path.getsize("model")/2.**10
+
+print("Temperature mae on test set: {:0.03}.\nHumidity mae on test set: {:0.03}.\n Model size: {:} kB.".\
+      format(temp, hum, size))
