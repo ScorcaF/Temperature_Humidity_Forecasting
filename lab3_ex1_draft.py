@@ -4,6 +4,8 @@ import os
 import pandas as pd
 import tensorflow as tf
 
+#ciao buonasera scorca u trmon
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--version', type=str, required=True)
