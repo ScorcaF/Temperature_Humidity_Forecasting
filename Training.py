@@ -75,8 +75,21 @@ model.compile(optimizer='adam',
 
 history = model.fit(train_ds, validation_data = val_ds, epochs=20, callbacks=[cp_callback])
 
+
+
+
+#Converting and saving the model in a tflite file
+converter = tf.lite.TFLiteConverter.from_saved_model('./model')
+tflite_model = converter.convert()
+filename = 'model.tflite'
+with open(filename, 'wb') as f:
+    f.write(tflite_model)
+    
+    
+  
+#Printing results  
 temp, hum = model.evaluate(test_ds)[1]
-size = os.path.getsize("model")/2.**10
+size = os.path.getsize(filename) / 2.**10
 
 print("Temperature mae on test set: {:0.03}.\nHumidity mae on test set: {:0.03}.\n Model size: {:} kB.".\
       format(temp, hum, size))
