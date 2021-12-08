@@ -56,6 +56,10 @@ train_ds = generator.make_dataset(train_data, True)
 val_ds = generator.make_dataset(val_data, False)
 test_ds = generator.make_dataset(test_data, False)
 
+#Saving datasets
+tf.data.experimental.save(train_ds, './th_train')
+tf.data.experimental.save(val_ds, './th_val')
+tf.data.experimental.save(test_ds, './th_test')
 
 #Magnitude based pruning 
 pruning_params = {'pruning_schedule': tfmot.sparsity.keras.PolynomialDecay(initial_sparsity=0.30,    
@@ -107,8 +111,4 @@ with open(filename, 'wb') as f:
     
     
   
-#Printing results  
-size = os.path.getsize(filename) / 2.**10
 
-print("Temperature mae on test set: {:0.03}.\nHumidity mae on test set: {:0.03}.\n Model size: {:} kB.".\
-      format(temp, hum, size))
