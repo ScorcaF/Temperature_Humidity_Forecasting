@@ -5,6 +5,7 @@ import pandas as pd
 import tensorflow as tf
 from WindowGenerator import WindowGenerator 
 from multi_outputMAE import multi_outputMAE 
+from CustomEarlyStopping import CustomEarlyStopping
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--version', type=str, required=True)
@@ -43,23 +44,22 @@ if args.version == "a":
     output_width = 3
 elif args.version == "b":
     output_width = 9
-
-#Definine callback to save best only
-cp_callback = tf.keras.callbacks.ModelCheckpoint(
-    './model',
-    monitor='val_loss',
-    verbose=0, 
-    save_best_only=True,
-    save_weights_only=False,
-    mode='auto',
-    save_freq='epoch'
-)
-
+    
 #Creating windows dataset, to feed to the model
 generator = WindowGenerator(input_width, output_width, mean, std)
 train_ds = generator.make_dataset(train_data, True)
 val_ds = generator.make_dataset(val_data, False)
 test_ds = generator.make_dataset(test_data, False)
+
+
+#Magnitude based pruning 
+pruning_params = {'pruning_schedule': tfmot.sparsity.keras.PolynomialDecay(initial_sparsity=0.30,    
+                                                                           final_sparsity=0.9,
+                                                                           begin_step=len(train_ds)*5,
+                                                                           end_step=len(train_ds)*15)}
+callbacks = [tfmot.sparsity.keras.UpdatePruningStep(), CustomEarlyStopping()] 
+
+
 
 #Model definition
 model = tf.keras.Sequential([
@@ -69,17 +69,28 @@ model = tf.keras.Sequential([
                           tf.keras.layers.Dense(units=2*output_width),
                           tf.keras.layers.Reshape((output_width, 2))])
 
+prune_low_magnitude = tfmot.sparsity.keras.prune_low_magnitude 
+model = prune_low_magnitude(model, **pruning_params)
+
+#Training the model
 model.compile(optimizer='adam',
             loss = tf.keras.losses.mean_squared_error,
             metrics= [multi_outputMAE()])
 
-history = model.fit(train_ds, validation_data = val_ds, epochs=20, callbacks=[cp_callback])
+model.fit(train_ds, validation_data = val_ds, epochs=20, callbacks=callbacks)
+model = tfmot.sparsity.keras.strip_pruning(model)
+run_model = tf.function(lambda x: model(x))   
+
+#Saving the model
+concrete_func = run_model.get_concrete_function(tf.TensorSpec([1, 6, 2], tf.float32))
+model.save('./model', signatures=concrete_func)
 
 
 
 
-#Converting and saving the model in a tflite file
+# Converting and saving the model in a tflite file
 converter = tf.lite.TFLiteConverter.from_saved_model('./model')
+converter.optimizations = [tf.lite.Optimize.DEFAULT]   #Weight quantization
 tflite_model = converter.convert()
 filename = 'model.tflite'
 with open(filename, 'wb') as f:
