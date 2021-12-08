@@ -3,9 +3,14 @@ import numpy as np
 import os
 import pandas as pd
 import tensorflow as tf
+import tensorflow_model_optimization as tfmot 
+
+
 from WindowGenerator import WindowGenerator 
 from multi_outputMAE import multi_outputMAE 
 from CustomEarlyStopping import CustomEarlyStopping
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--version', type=str, required=True)
