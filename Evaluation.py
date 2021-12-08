@@ -2,9 +2,10 @@ import numpy as np
 import tensorflow.lite as tflite
 import argparse
 
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--version', type=str, required=True)
-# args = parser.parse_args()
+parser = argparse.ArgumentParser()
+parser.add_argument('--version', type=str, required=True)
+args = parser.parse_args()
+
 
 #Loading test dataset
 tensor_specs = (tf.TensorSpec([None, 6, 2], dtype=tf.float32), tf.TensorSpec([None,9, 2]))
@@ -12,7 +13,7 @@ test_ds = tf.data.experimental.load('./th_test', tensor_specs)
 test_ds = test_ds.unbatch().batch(1)
 
 #Loading tflite model
-filename = 'model.tflite'
+filename = 'model_' + args.version + '.tflite'
 interpreter = tflite.Interpreter(filename)
 
 #Preparing for inference
