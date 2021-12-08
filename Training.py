@@ -96,7 +96,7 @@ run_model = tf.function(lambda x: model(x))
 
 #Saving the model
 concrete_func = run_model.get_concrete_function(tf.TensorSpec([1, 6, 2], tf.float32))
-model.save('./model', signatures=concrete_func)
+model.save('./model_{}'.format(args.version), signatures=concrete_func)
 
 
 
