@@ -85,6 +85,8 @@ model.compile(optimizer='adam',
             metrics= [multi_outputMAE()])
 
 model.fit(train_ds, validation_data = val_ds, epochs=20, callbacks=callbacks)
+temp, hum = model.evaluate(test_ds)[1]
+
 model = tfmot.sparsity.keras.strip_pruning(model)
 run_model = tf.function(lambda x: model(x))   
 
@@ -106,7 +108,6 @@ with open(filename, 'wb') as f:
     
   
 #Printing results  
-temp, hum = model.evaluate(test_ds)[1]
 size = os.path.getsize(filename) / 2.**10
 
 print("Temperature mae on test set: {:0.03}.\nHumidity mae on test set: {:0.03}.\n Model size: {:} kB.".\
