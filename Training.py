@@ -78,6 +78,8 @@ prune_low_magnitude = tfmot.sparsity.keras.prune_low_magnitude
 model = prune_low_magnitude(model, **pruning_params)
 
 #Training the model
+input_shape = [32, 6, 2]
+model.build(input_shape)
 model.compile(optimizer='adam',
             loss = tf.keras.losses.mean_squared_error,
             metrics= [multi_outputMAE()])
