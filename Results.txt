@@ -1,0 +1,19 @@
+# Weight Quantization
+Temperature mae on test set: 0.691.
+Humidity mae on test set: 2.4.
+Model size: 23.203125 kB.
+
+# Sparsity 0.8 
+Temperature mae on test set: 0.524.
+Humidity mae on test set: 2.27.
+Model size: 22.2109375 kB.
+
+# Sparsity 0.8 and Weight Quantization
+Temperature mae on test set: 0.546.
+Humidity mae on test set: 2.25.
+Model size: 7.2900390625 kB.
+
+# Sparsity 0.9 and Weight Quantization
+Temperature mae on test set: 0.645.
+Humidity mae on test set: 2.43.
+Model size: 5.263671875 kB.
