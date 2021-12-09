@@ -70,12 +70,15 @@ callbacks = [CustomEarlyStopping()]
 
 
 #Model definition
+alpha = 0.125
+beta = 0.125
 model = tf.keras.Sequential([
-                          tf.keras.layers.Conv1D(filters=64, kernel_size=3, activation = "relu"),
+                          tf.keras.layers.Conv1D(filters=alpha*64, kernel_size=3, activation = "relu"),
                           tf.keras.layers.Flatten(),
-                          tf.keras.layers.Dense(units=64, activation = 'relu'),
+                          tf.keras.layers.Dense(units=beta*64, activation = 'relu'),
                           tf.keras.layers.Dense(units=2*output_width),
                           tf.keras.layers.Reshape((output_width, 2))])
+
 
 
 
@@ -92,7 +95,7 @@ model.fit(train_ds, validation_data = val_ds, epochs=20, callbacks=callbacks, ve
 
 #Magnitude based pruning parameters
 pruning_params = {'pruning_schedule': tfmot.sparsity.keras.PolynomialDecay(initial_sparsity=0.30,    
-                                                                           final_sparsity=0.9,
+                                                                           final_sparsity=0.8,
                                                                            begin_step=len(train_ds)*5,
                                                                            end_step=len(train_ds)*15)}
 callbacks = [tfmot.sparsity.keras.UpdatePruningStep(), CustomEarlyStopping()] 
