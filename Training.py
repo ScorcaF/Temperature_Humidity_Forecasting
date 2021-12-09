@@ -49,8 +49,35 @@ input_width = 6
 
 if args.version == "a":
     output_width = 3
+    #parameters for structured pruning
+    alpha = 1/8
+    beta = 1/16
+    #Model definition: MLP
+    model = tf.keras.Sequential([
+                          tf.keras.layers.Flatten(input_shape=(6, 2)),
+                          tf.keras.layers.Dense(units=alpha*128, activation = 'relu'),
+                          tf.keras.layers.Dense(units=beta*128, activation = 'relu'),
+                          tf.keras.layers.Dense(units=2*output_width),
+                          tf.keras.layers.Reshape((output_width, 2))])
+    
+    #Final sparsity of the CNN
+    final_sparsity = 0.78
+    
 elif args.version == "b":
     output_width = 9
+    
+    #parameters for structured pruning
+    alpha = 0.125
+    beta = 0.125
+    #Model definition: CNN
+    model = tf.keras.Sequential([
+                          tf.keras.layers.Conv1D(filters=alpha*64, kernel_size=3, activation = "relu"),
+                          tf.keras.layers.Flatten(),
+                          tf.keras.layers.Dense(units=beta*64, activation = 'relu'),
+                          tf.keras.layers.Dense(units=2*output_width),
+                          tf.keras.layers.Reshape((output_width, 2))])
+    #Final sparsity of the CNN
+    final_sparsity = 0.8
     
 #Creating windows dataset, to feed to the model
 generator = WindowGenerator(input_width, output_width, mean, std)
@@ -64,22 +91,7 @@ tf.data.experimental.save(val_ds, './th_val')
 tf.data.experimental.save(test_ds, './th_test')
 
 
-
 callbacks = [CustomEarlyStopping()] 
-
-
-
-#Model definition
-alpha = 0.125
-beta = 0.125
-model = tf.keras.Sequential([
-                          tf.keras.layers.Conv1D(filters=alpha*64, kernel_size=3, activation = "relu"),
-                          tf.keras.layers.Flatten(),
-                          tf.keras.layers.Dense(units=beta*64, activation = 'relu'),
-                          tf.keras.layers.Dense(units=2*output_width),
-                          tf.keras.layers.Reshape((output_width, 2))])
-
-
 
 
 #Training the model for the first time
@@ -95,7 +107,7 @@ model.fit(train_ds, validation_data = val_ds, epochs=20, callbacks=callbacks, ve
 
 #Magnitude based pruning parameters
 pruning_params = {'pruning_schedule': tfmot.sparsity.keras.PolynomialDecay(initial_sparsity=0.30,    
-                                                                           final_sparsity=0.8,
+                                                                           final_sparsity=final_sparsity,
                                                                            begin_step=len(train_ds)*5,
                                                                            end_step=len(train_ds)*15)}
 callbacks = [tfmot.sparsity.keras.UpdatePruningStep(), CustomEarlyStopping()] 
