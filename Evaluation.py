@@ -13,7 +13,7 @@ test_ds = tf.data.experimental.load('./th_test', tensor_specs)
 test_ds = test_ds.unbatch().batch(1)
 
 #Loading tflite model
-tflite_model_dir = "GroupN_th_" + args.version + ".tflite.zlib"
+tflite_model_dir = "Group14_th_" + args.version + ".tflite.zlib"
 tflite_compressed_model = open(tflite_model_dir, 'rb').read()
 tflite_model = zlib.decompress(tflite_compressed_model)
 interpreter = tflite.Interpreter(model_content = tflite_model)
