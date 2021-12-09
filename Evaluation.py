@@ -13,8 +13,11 @@ test_ds = tf.data.experimental.load('./th_test', tensor_specs)
 test_ds = test_ds.unbatch().batch(1)
 
 #Loading tflite model
-filename = 'model_' + args.version + '.tflite'
-interpreter = tflite.Interpreter(filename)
+tflite_model_dir = "GroupN_th_" + args.version + ".tflite.zlib"
+tflite_compressed_model = open(tflite_model_dir, 'rb').read()
+tflite_model = zlib.decompress(tflite_compressed_model)
+interpreter = tflite.Interpreter(model_content = tflite_model)
+
 
 #Preparing for inference
 interpreter.allocate_tensors()
@@ -37,7 +40,7 @@ for series in test_ds:
     
 #Evaluating performance 
 temp, hum = multi_outputMAE(y_true, y_pred)
-size = os.path.getsize(filename) / 2.**10
+size = os.path.getsize(tflite_model_dir) / 2.**10
 
 
 #Printing results  
