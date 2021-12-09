@@ -24,3 +24,34 @@ Humidity mae on test set: 2.27.
 Model size: 4.107421875 kB.
 
 # Sparsity 0.9, Weight Quantization and StructuredPruning with alpha = 0.5 
+Temperature mae on test set: 0.582.
+Humidity mae on test set: 2.33.
+Model size: 2.830078125 kB.
+
+# Sparsity 0.9, Weight Quantization and StructuredPruning with alpha = 0.5 CL, beta = alpha/2 DL
+
+Temperature mae on test set: 0.595.
+Humidity mae on test set: 2.34.
+Model size: 2.203125 kB.
+
+# Sparsity 0.9, Weight Quantization and StructuredPruning with alpha = 0.5 CL, beta = alpha/4 DL
+Temperature mae on test set: 3.22.
+Humidity mae on test set: 2.51.
+Model size: 1.845703125 kB.
+
+# Sparsity 0.9, Weight Quantization and StructuredPruning with alpha = 0.5 CL, beta = 0.375 DL
+Temperature mae on test set: 0.638.
+Humidity mae on test set: 2.26.
+Model size: 2.5302734375 kB.
+
+# Sparsity 0.95, Weight Quantization and StructuredPruning with alpha = 0.5 CL, beta = 0.375 DL
+Temperature mae on test set: 0.56.
+Humidity mae on test set: 2.36.
+Model size: 2.1845703125 kB.
+
+# Sparsity 0.98, Weight Quantization and StructuredPruning with alpha = 0.5 CL, beta = 0.375 DL
+Temperature mae on test set: 7.42.
+Humidity mae on test set: 14.4.
+Model size: 1.91796875 kB.
+
+# Sparsity 0.95, Weight Quantization and StructuredPruning with alpha = 0.5 CL, beta = 0.3125 DL
