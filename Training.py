@@ -118,8 +118,8 @@ model.save('./model_{}'.format(args.version), signatures=concrete_func)
 
 
 # Converting and saving the model in a compressed file
-tflite_model_dir = "./model_to_compress.zlib"
-converter = tf.lite.TFLiteConverter.from_saved_model('./model_sparse')
+tflite_model_dir = "Group14_th_" + args.version + ".tflite.zlib"
+converter = tf.lite.TFLiteConverter.from_saved_model('./model_{}')
 converter.optimizations = [tf.lite.Optimize.DEFAULT]   #Weight quantization
 tflite_model = converter.convert() 
 with open(tflite_model_dir, 'wb') as fp:     
