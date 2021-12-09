@@ -133,7 +133,7 @@ Temperature mae on test set: 0.925.
 Humidity mae on test set: 2.38.
 Model size: 1.68 kB.
 
-# Sparsity 0.8, Weight Quantization and StructuredPruning with alpha = 0.125 CL, beta = 0.125 DL
+# Sparsity 0.8, Weight Quantization and StructuredPruning with alpha = 0.125 CL, beta = 0.125 DL <----------------------------------------------
 Temperature mae on test set: 0.659.
 Humidity mae on test set: 2.39.
 Model size: 1.79 kB.
