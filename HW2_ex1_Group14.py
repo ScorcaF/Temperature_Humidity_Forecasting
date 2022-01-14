@@ -8,12 +8,84 @@ import zlib
 
 
 
-from WindowGenerator import WindowGenerator 
-from multi_outputMAE import multi_outputMAE 
-from CustomEarlyStopping import CustomEarlyStopping
+class multi_outputMAE(tf.keras.metrics.Metric):
+    def __init__(self, name='multi_outputMAE', **kwargs):
+        super(multi_outputMAE, self).__init__(name=name, **kwargs)
+        self.mae = self.add_weight(name='mae', initializer='zeros', shape = (2,))
+        self.counter = self.add_weight(name='counter', initializer='zeros')
+
+    def update_state(self, y_true, y_pred, sample_weight = None):
+        values = tf.subtract(y_true, y_pred)
+        values = tf.abs(values)
+        values = tf.math.reduce_mean(values, axis = 1)
+        values = tf.math.reduce_mean(values, axis = 0)
+        self.mae.assign_add(values)
+        self.counter.assign_add(1)
+
+        
+    def reset_states(self, sample_weight = None):
+        self.mae.assign(tf.zeros_like(self.mae))
+        self.counter.assign(tf.zeros_like(self.counter))
 
 
+    def result(self):
+        return tf.math.divide_no_nan(self.mae, self.counter)
+      
+      
+class WindowGenerator:
+    def __init__(self, input_width, output_width, mean, std):
+        self.input_width = input_width
+        self.output_width = output_width
+        self.mean = tf.reshape(tf.convert_to_tensor(mean), [1, 1, 2])
+        self.std = tf.reshape(tf.convert_to_tensor(std), [1, 1, 2])
 
+    def split_window(self, features):
+        inputs = features[:, :-self.output_width, :] 
+        labels = features[:, -self.output_width:, :]
+        
+        inputs.set_shape([None, self.input_width, 2])
+        labels.set_shape([None, self.output_width, 2])
+
+        return inputs, labels
+
+    def normalize(self, features):
+        features = (features - self.mean) / (self.std + 1.e-6)
+
+        return features
+
+    def preprocess(self, features):
+        inputs, labels = self.split_window(features)
+        inputs = self.normalize(inputs)
+
+        return inputs, labels
+
+    def make_dataset(self, data, train):
+        ds = tf.keras.preprocessing.timeseries_dataset_from_array(
+                data=data,
+                targets=None,
+                sequence_length=self.input_width+self.output_width,
+                sequence_stride=1,
+                batch_size=32)
+        ds = ds.map(self.preprocess)
+        ds = ds.cache()
+        if train is True:
+            ds = ds.shuffle(100, reshuffle_each_iteration=True)
+
+        return ds
+      
+class CustomEarlyStopping(tf.keras.callbacks.Callback):
+   
+  def on_epoch_end(self, epoch, logs):
+    if logs['val_multi_outputMAE'][0] < 0.5 and logs['val_multi_outputMAE'][1] < 2.2 and epoch >=15:
+      print("\nEarly stopping conditions satisfied")
+      self.model.stop_training = True
+    
+    
+    
+    
+    
+    
+    
 parser = argparse.ArgumentParser()
 parser.add_argument('--version', type=str, required=True)
 args = parser.parse_args()
@@ -140,7 +212,3 @@ tflite_model = converter.convert()
 with open(tflite_model_dir, 'wb') as fp:     
     tflite_compressed = zlib.compress(tflite_model)     
     fp.write(tflite_compressed)
-    
-    
-  
-
